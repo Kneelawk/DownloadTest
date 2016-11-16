@@ -16,3 +16,18 @@ let outputFileName = outputDir + '/' + downloadUrl.slice(downloadUrl.lastIndexOf
 let outputFile = fs.createWriteStream(outputFileName);
 
 console.log('Downloading to: ' + outputFileName);
+
+let size = 0;
+let downloaded = 0;
+
+request(downloadUrl).on('response', (response) => {
+  size = response.headers['content-length'];
+  console.log('Download size: ' + size);
+}).on('data', (chunk) => {
+  downloaded += chunk.length;
+  console.log('Downloaded: ' + Math.floor(downloaded * 100 / size) + '%');
+}).on('end', () => {
+  console.log('Done.');
+}).on('error', (err) => {
+  console.log('Error: ' + err);
+}).pipe(outputFile);
